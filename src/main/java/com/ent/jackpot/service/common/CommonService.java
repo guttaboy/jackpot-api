@@ -1,15 +1,18 @@
 package com.ent.jackpot.service.common;
 
 import com.ent.jackpot.entity.Jackpot;
+import com.ent.jackpot.entity.Match;
 import com.ent.jackpot.entity.Player;
 import com.ent.jackpot.entity.PlayerAssociation;
 import com.ent.jackpot.jpaspecs.JackpotSpecs;
+import com.ent.jackpot.jpaspecs.MatchSpecs;
 import com.ent.jackpot.jpaspecs.PlayerAssociationSpecs;
 import com.ent.jackpot.jpaspecs.PlayerSpecs;
 import com.ent.jackpot.model.JackpotResponseModel;
-import com.ent.jackpot.model.PlayerDetailsResponseModel;
+import com.ent.jackpot.model.MatchesResponseModel;
 import com.ent.jackpot.model.PlayerJackpotResponseModel;
 import com.ent.jackpot.repository.JackpotRepository;
+import com.ent.jackpot.repository.MatchRepository;
 import com.ent.jackpot.repository.PlayerAssociationRepository;
 import com.ent.jackpot.repository.PlayerRepository;
 import lombok.AllArgsConstructor;
@@ -47,6 +50,12 @@ public class CommonService {
 
     @Autowired
     PlayerAssociationSpecs playerAssociationSpecs;
+
+    @Autowired
+    MatchRepository matchRepository;
+
+    @Autowired
+    MatchSpecs matchSpecs;
 
     public JackpotResponseModel getJackpotDetails(Integer jackpotId){
         //retrieve jackpot details using jackpotId
@@ -106,6 +115,20 @@ public class CommonService {
         if(!CollectionUtils.isEmpty(playerAssoociationEntityList)){
             for(PlayerAssociation playerAscnEntity: playerAssoociationEntityList){
                 playerIds.add(playerAscnEntity.getPlayerId());
+            }
+        }
+    }
+
+    public void getMatchDetailsByJackpotId(Integer jackpotId, ArrayList<MatchesResponseModel> matchResponseBodyList){
+        List<Match> matchEntityList = matchRepository.findAll(matchSpecs.getMatchDetailsByJackpotId(jackpotId));
+        if(!CollectionUtils.isEmpty(matchEntityList)){
+            for(Match matchEntity: matchEntityList){
+                var match = new MatchesResponseModel();
+                match.setMatchName(matchEntity.getMatchName());
+                match.setMatchNumber(matchEntity.getMatchNumber());
+                match.setTeam1(matchEntity.getTeam1());
+                match.setTeam2(matchEntity.getTeam2());
+                matchResponseBodyList.add(match);
             }
         }
     }
