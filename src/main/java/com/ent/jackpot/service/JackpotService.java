@@ -53,12 +53,6 @@ public class JackpotService {
     PlayerAssociationSpecs playerAssociationSpecs;
 
     @Autowired
-    MatchRepository matchRepository;
-
-    @Autowired
-    MatchSpecs matchSpecs;
-
-    @Autowired
     CommonService commonService;
 
     public Integer createJackpot(JackpotActivationModel jackpotActivationModel){
@@ -95,26 +89,14 @@ public class JackpotService {
     }
 
     public JackpotResponseModel retrieveJackpotDetails(Integer jackpotId){
-
         //retrieve jackpot details using jackpotId
         var jackpotResponseModel = commonService.getJackpotDetails(jackpotId);
 
         //retrieve Matches details using jackpotId
         var matchResponseBodyList = new ArrayList<MatchesResponseModel>();
+        commonService.getMatchDetailsByJackpotId(jackpotId, matchResponseBodyList);
 
-        List<Match> matchEntityList = matchRepository.findAll(matchSpecs.getMatchDetailsByJackpotId(jackpotId));
-        if(!CollectionUtils.isEmpty(matchEntityList)){
-            for(Match matchEntity: matchEntityList){
-                var match = new MatchesResponseModel();
-                match.setMatchName(matchEntity.getMatchName());
-                match.setMatchNumber(matchEntity.getMatchNumber());
-                match.setTeam1(matchEntity.getTeam1());
-                match.setTeam2(matchEntity.getTeam2());
-                matchResponseBodyList.add(match);
-            }
-        }
         jackpotResponseModel.setMatchesList(matchResponseBodyList);
-
         return jackpotResponseModel;
     }
 }
