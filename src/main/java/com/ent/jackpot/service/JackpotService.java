@@ -52,12 +52,6 @@ public class JackpotService {
     @Autowired
     PlayerAssociationSpecs playerAssociationSpecs;
 
-//    @Autowired
-//    MatchRepository matchRepository;
-//
-//    @Autowired
-//    MatchSpecs matchSpecs;
-
     @Autowired
     CommonService commonService;
 
