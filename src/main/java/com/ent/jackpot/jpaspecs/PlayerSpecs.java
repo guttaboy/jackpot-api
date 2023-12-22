@@ -26,6 +26,11 @@ public class PlayerSpecs {
                 criteriaBuilder.equal(root.get("userName"), userName);
     }
 
+    public Specification<Player> getPlayerDetailsByPlayerId(Object playerId){
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("playerActivationId"), playerId);
+    }
+
     public List<Player> getPlayerDetailsByPlayerIds(List<Integer> playerIds){
         var criteriaBuilder = entityManager.getCriteriaBuilder();
         var query = criteriaBuilder.createQuery(Player.class);

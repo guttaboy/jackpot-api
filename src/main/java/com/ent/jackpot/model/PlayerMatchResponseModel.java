@@ -24,14 +24,14 @@ public class PlayerMatchResponseModel {
     @JsonProperty("team2")
     private String team2;
 
-    @JsonProperty("matchDate")
-    private String matchDate;
+//    @JsonProperty("matchDate")
+//    private String matchDate;
 
     @JsonProperty("prediction")
     private String prediction;
 
-    @JsonProperty("won")
-    private String won;
+    @JsonProperty("result")
+    private String result;
 
     @JsonProperty("matchPoints")
     private String matchPoints;

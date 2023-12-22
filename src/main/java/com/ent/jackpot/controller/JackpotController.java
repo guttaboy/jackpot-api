@@ -2,10 +2,12 @@ package com.ent.jackpot.controller;
 
 import com.ent.jackpot.exception.JackpotApiException;
 import com.ent.jackpot.model.JackpotActivationModel;
+import com.ent.jackpot.model.JackpotCreateResponseModel;
 import com.ent.jackpot.model.JackpotResponseModel;
 import com.ent.jackpot.service.JackpotService;
 import com.ent.jackpot.util.ValidatorUtil;
 import lombok.extern.slf4j.Slf4j;
+import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,11 +26,13 @@ public class JackpotController {
     JackpotService jackpotActivationService;
 
     @PostMapping(value = "/createJackpot", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Integer updateJackpotActivationDetails(
+    public JackpotCreateResponseModel updateJackpotActivationDetails(
+            String playerName,
             @RequestBody JackpotActivationModel jackpotActivationModel) throws Exception {
         validatorUtil.validateJackpotActivationModel(jackpotActivationModel);
         // service call here
-        return jackpotActivationService.createJackpot(jackpotActivationModel);
+        var jackpotCreateResponseModel = jackpotActivationService.createJackpot(playerName, jackpotActivationModel);
+        return jackpotCreateResponseModel;
     }
 
     @GetMapping(value="/getJackpot")

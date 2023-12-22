@@ -68,6 +68,7 @@ public class CommonService {
         var paramMap = getJackpot(jackpotId);
         jackpotResponseModel.setJackpotName(String.valueOf(paramMap.get("JACKPOT_NAME")));
         jackpotResponseModel.setJackpotAmount(String.valueOf(paramMap.get("JACKPOT_AMOUNT")));
+        jackpotResponseModel.setJackpotCreatedPlayer(getPlayerNameByPlayerId(paramMap.get("JACKPOT_CRTD_PLR")));
 
         //Extract players from PlayerAssociation table by using jackpot Id.
         var playerIds = new ArrayList<Integer>();
@@ -100,6 +101,7 @@ public class CommonService {
         paramMap.put("JACKPOT_NAME", jackpotEntity.get().getJackpotName());
         paramMap.put("JACKPOT_AMOUNT", jackpotEntity.get().getJackpotMoney());
         paramMap.put("JACKPOT_ID", jackpotEntity.get().getJackpotId());
+        paramMap.put("JACKPOT_CRTD_PLR", jackpotEntity.get().getJackpotCreatedPlayerId());
 
         return paramMap;
     }
@@ -144,6 +146,16 @@ public class CommonService {
         Optional<Player> playerEntity = playerRepository.findOne(playerSpecs.getPlayerDetailsByUserName(playerName));
         if(playerEntity.isPresent()) {
             return playerEntity.get().getPlayerActivationId();
+        }else{
+            throw  new JackpotApiException(HttpStatus.NOT_FOUND, "No Data Found", "Player doesn't exist");
+        }
+    }
+
+    private String getPlayerNameByPlayerId(Object playerId){
+        //get userName by PlayerId
+        Optional<Player> playerEntity = playerRepository.findOne(playerSpecs.getPlayerDetailsByPlayerId(playerId));
+        if(playerEntity.isPresent()) {
+            return playerEntity.get().getUserName();
         }else{
             throw  new JackpotApiException(HttpStatus.NOT_FOUND, "No Data Found", "Player doesn't exist");
         }

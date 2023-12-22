@@ -35,7 +35,18 @@ public class MatchService {
     @Autowired
     PointsRepository pointsRepository;
 
-    public CreateMatchResponseModel createMatch(MatchCreateModel matchCreateModel, Integer jackpotId){
+    public CreateMatchResponseModel createMatchesList(List<MatchCreateModel> matchCreateModelList, Integer jackpotId){
+        matchCreateModelList.forEach(matchCreateModel -> {
+            createMatch(matchCreateModel, jackpotId);
+        });
+        var createMatchResponseModel = new CreateMatchResponseModel();
+        createMatchResponseModel.setMessage("Matches created successfully");
+        createMatchResponseModel.setStatusCode(HttpStatus.CREATED);
+
+        return createMatchResponseModel;
+    }
+
+    public void createMatch(MatchCreateModel matchCreateModel, Integer jackpotId){
 
         var match = Match.builder()
                 .matchNumber(matchCreateModel.getMatchNumber())
@@ -60,18 +71,6 @@ public class MatchService {
             throw new JackpotApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data Base Issue", "Unexpected exception occured while creating the records");
         }
 
-        var createMatchResponseModel = new CreateMatchResponseModel();
-        createMatchResponseModel.setMessage("Match created successfully");
-        createMatchResponseModel.setStatusCode(HttpStatus.CREATED);
-
-        return createMatchResponseModel;
-    }
-
-    public String createMatchesList(List<MatchCreateModel> matchCreateModelList, Integer jackpotId){
-        matchCreateModelList.forEach(matchCreateModel -> {
-            createMatch(matchCreateModel, jackpotId);
-        });
-        return "Matches List Created Successfully!";
     }
 
     public List<MatchesResponseModel> getMatchesFromJackpot(Integer jackpotId){
