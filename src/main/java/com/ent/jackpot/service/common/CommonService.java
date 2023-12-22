@@ -56,6 +56,12 @@ public class CommonService {
     @Autowired
     PredictionSpecs predictionSpecs;
 
+    @Autowired
+    PointsRepository pointsRepository;
+
+    @Autowired
+    PointsSpecs pointsSpecs;
+
     public JackpotResponseModel getJackpotDetails(Integer jackpotId){
         //retrieve jackpot details using jackpotId
         var jackpotResponseModel = new JackpotResponseModel();
@@ -127,6 +133,7 @@ public class CommonService {
                 match.setMatchNumber(matchEntity.getMatchNumber());
                 match.setTeam1(matchEntity.getTeam1());
                 match.setTeam2(matchEntity.getTeam2());
+                match.setMaximumPoints(getMaxPointsByMatchId(matchEntity.getMatchId()));
                 matchResponseBodyList.add(match);
             }
         }
@@ -158,6 +165,15 @@ public class CommonService {
             return predictionEntity.get().getPredictedTeam();
         }else{
             return "TBD";
+        }
+    }
+
+    private Integer getMaxPointsByMatchId(Integer matchId){
+        Optional<Points> pointsEntity = pointsRepository.findOne(pointsSpecs.getPointsByMatchId(matchId));
+        if(pointsEntity.isPresent()) {
+            return pointsEntity.get().getMaximumPoints();
+        }else{
+            return 0;
         }
     }
 

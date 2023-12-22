@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-@RequestMapping("/api/profile/v1")
+@RequestMapping("/api/jackpot/v1")
 @Slf4j
 public class PredictionController {
 

@@ -1,10 +1,13 @@
 package com.ent.jackpot.service;
 
 import com.ent.jackpot.entity.Match;
+import com.ent.jackpot.entity.Points;
 import com.ent.jackpot.exception.JackpotApiException;
-import com.ent.jackpot.model.MatchRequestModel;
+import com.ent.jackpot.model.CreateMatchResponseModel;
+import com.ent.jackpot.model.MatchCreateModel;
 import com.ent.jackpot.model.MatchesResponseModel;
 import com.ent.jackpot.repository.MatchRepository;
+import com.ent.jackpot.repository.PointsRepository;
 import com.ent.jackpot.service.common.CommonService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -29,13 +32,16 @@ public class MatchService {
     @Autowired
     CommonService commonService;
 
-    public String createMatch(MatchRequestModel matchRequestModel, Integer jackpotId){
+    @Autowired
+    PointsRepository pointsRepository;
+
+    public CreateMatchResponseModel createMatch(MatchCreateModel matchCreateModel, Integer jackpotId){
 
         var match = Match.builder()
-                .matchNumber(matchRequestModel.getMatchNumber())
-                .matchName(matchRequestModel.getMatchName())
-                .team1(matchRequestModel.getTeam1())
-                .team2(matchRequestModel.getTeam2())
+                .matchNumber(matchCreateModel.getMatchNumber())
+                .matchName(matchCreateModel.getMatchName())
+                .team1(matchCreateModel.getTeam1())
+                .team2(matchCreateModel.getTeam2())
                 .jackpotId(jackpotId)
                 .build();
 
@@ -43,12 +49,27 @@ public class MatchService {
         if(createdMatch == null) {
             throw new JackpotApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data Base Issue", "Unexpected exception occured while creating the records");
         }
-        return "Match Created Successfully!";
+
+        //set Maximum points to the match while creating
+        var points = Points.builder()
+                .matchId(createdMatch.getMatchId())
+                .maximumPoints(matchCreateModel.getMaxPoints())
+                .build();
+        var createdPoints = pointsRepository.save(points);
+        if(createdPoints == null) {
+            throw new JackpotApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data Base Issue", "Unexpected exception occured while creating the records");
+        }
+
+        var createMatchResponseModel = new CreateMatchResponseModel();
+        createMatchResponseModel.setMessage("Match created successfully");
+        createMatchResponseModel.setStatusCode(HttpStatus.CREATED);
+
+        return createMatchResponseModel;
     }
 
-    public String createMatchesList(List<MatchRequestModel> matchRequestModelList, Integer jackpotId){
-        matchRequestModelList.forEach(matchRequestModel -> {
-            createMatch(matchRequestModel, jackpotId);
+    public String createMatchesList(List<MatchCreateModel> matchCreateModelList, Integer jackpotId){
+        matchCreateModelList.forEach(matchCreateModel -> {
+            createMatch(matchCreateModel, jackpotId);
         });
         return "Matches List Created Successfully!";
     }

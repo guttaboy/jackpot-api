@@ -2,13 +2,11 @@ package com.ent.jackpot.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
 @lombok.Builder
 @lombok.Data
 @lombok.AllArgsConstructor
 @lombok.NoArgsConstructor
-public class MatchRequestModel {
+public class MatchCreateModel {
 
     @JsonProperty("matchNumber")
     private String matchNumber;
@@ -21,5 +19,8 @@ public class MatchRequestModel {
 
     @JsonProperty("team2")
     private String team2;
+
+    @JsonProperty("maxPoints")
+    private Integer maxPoints;
 
 }

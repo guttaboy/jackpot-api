@@ -33,7 +33,7 @@ public class MatchesResponseModel {
     @JsonProperty("won")
     private String won;
 
-//    @JsonProperty("matchPoints")
-//    private String matchPoints;
+    @JsonProperty("maximumPoints")
+    private Integer maximumPoints;
 
 }
