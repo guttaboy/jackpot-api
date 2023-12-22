@@ -1,8 +1,6 @@
 package com.ent.jackpot.repository;
 
-import com.ent.jackpot.entity.Jackpot;
 import com.ent.jackpot.entity.Match;
-import com.ent.jackpot.entity.PlayerAssociation;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

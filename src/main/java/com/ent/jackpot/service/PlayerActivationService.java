@@ -3,6 +3,7 @@ package com.ent.jackpot.service;
 import com.ent.jackpot.entity.Match;
 import com.ent.jackpot.entity.Player;
 import com.ent.jackpot.entity.PlayerAssociation;
+import com.ent.jackpot.entity.Prediction;
 import com.ent.jackpot.jpaspecs.MatchSpecs;
 import com.ent.jackpot.jpaspecs.PlayerAssociationSpecs;
 import com.ent.jackpot.jpaspecs.PlayerSpecs;
@@ -37,8 +38,8 @@ public class PlayerActivationService {
     @Autowired
     PlayerAssociationRepository playerAssociationRepository;
 
-    @Autowired
-    PlayerSpecs playerSpecs;
+//    @Autowired
+//    PlayerSpecs playerSpecs;
 
     @Autowired
     PlayerAssociationSpecs playerAssociationSpecs;
@@ -72,10 +73,13 @@ public class PlayerActivationService {
 
         //once the validation is done get details
         //get PlayerId by using userName
-        Optional<Player> playerEntity = playerRepository.findOne(playerSpecs.getPlayerDetailsByUserName(userName));
+
+        var playerId = commonService.getPlayerIdByPlayerName(userName);
+
+//        Optional<Player> playerEntity = playerRepository.findOne(playerSpecs.getPlayerDetailsByUserName(userName));
         var jackpotIds = new ArrayList<Integer>();
-        if(playerEntity.isPresent()){
-            var playerId = playerEntity.get().getPlayerActivationId();
+//        if(playerEntity.isPresent()){
+//            var playerId = playerEntity.get().getPlayerActivationId();
             //fetch jackpot details the player is associated to
             List<PlayerAssociation> playerAssoociationEntityList = playerAssociationRepository.findAll(playerAssociationSpecs.getPlayerAssociationByPlayerId(playerId));
 
@@ -84,7 +88,7 @@ public class PlayerActivationService {
                     jackpotIds.add(playerAscnEntity.getJackpotId());
                 }
             }
-        }
+//        }
 
         //retrieve Jackpot details associated to the player
         var playerJackpotResponseModelList = new ArrayList<PlayerJackpotResponseModel>();
@@ -96,6 +100,9 @@ public class PlayerActivationService {
         //retrieve Match Details associated to the jackpot
         retrievePlayerMatchDetails(jackpotIds, playerJackpotResponseModelList);
         responseBody.setJackpotsList(playerJackpotResponseModelList);
+
+        //retrieve Prediction Details
+//        retrievePredictionDetails(jackpotIds, );
 
         return responseBody;
     }
@@ -121,12 +128,13 @@ public class PlayerActivationService {
             if(!CollectionUtils.isEmpty(matchEntityList)) {
                 var playerMatchResponseBodyList = new ArrayList<PlayerMatchResponseModel>();
                 for (Match matchEntity : matchEntityList) {
-
                     var match = new PlayerMatchResponseModel();
                     match.setMatchName(matchEntity.getMatchName());
                     match.setMatchNumber(matchEntity.getMatchNumber());
                     match.setTeam1(matchEntity.getTeam1());
                     match.setTeam2(matchEntity.getTeam2());
+                    var predictedTeam = commonService.getPredictionDetails(matchEntity);
+                    match.setPrediction(predictedTeam);
                     playerMatchResponseBodyList.add(match);
                 }
                 // Filter jackpotResponseList based on jackpotID

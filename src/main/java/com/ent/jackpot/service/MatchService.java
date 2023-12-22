@@ -5,7 +5,6 @@ import com.ent.jackpot.exception.JackpotApiException;
 import com.ent.jackpot.model.MatchRequestModel;
 import com.ent.jackpot.model.MatchesResponseModel;
 import com.ent.jackpot.repository.MatchRepository;
-import com.ent.jackpot.repository.PlayerRepository;
 import com.ent.jackpot.service.common.CommonService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

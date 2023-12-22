@@ -1,6 +1,5 @@
 package com.ent.jackpot.jpaspecs;
 
-import com.ent.jackpot.entity.Jackpot;
 import com.ent.jackpot.entity.Player;
 import lombok.extern.slf4j.Slf4j;
 import lombok.var;

@@ -8,6 +8,7 @@ import com.ent.jackpot.jpaspecs.PlayerSpecs;
 import com.ent.jackpot.model.JackpotActivationModel;
 import com.ent.jackpot.model.MatchRequestModel;
 import com.ent.jackpot.model.PlayerActivationModel;
+import com.ent.jackpot.model.PredictionModel;
 import com.ent.jackpot.repository.JackpotRepository;
 import com.ent.jackpot.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
@@ -76,6 +77,11 @@ public class ValidatorUtil {
         validateIObjectNull(matchRequestModel.getMatchNumber(), "Match Number is Missing");
         validateIObjectNull(matchRequestModel.getTeam1(), "Team 1 is Missing");
         validateIObjectNull(matchRequestModel.getTeam2(), "Team 2 is Missing");
+    }
+
+    public void validatePredictionModel(PredictionModel predictionModel){
+        validateIObjectNull(predictionModel.getPredictedTeam(), "Team Name must be provided for prediction");
+        validateIObjectNull(predictionModel.getMatchNumber(), "Match Number must be provided for prediction");
     }
 
     private void validateIObjectNull(Object object, String errorMessage){
