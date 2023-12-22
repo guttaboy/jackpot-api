@@ -23,6 +23,9 @@ public class PlayerJackpotResponseModel {
     @JsonProperty("jackpotAmount")
     private String jackpotAmount;
 
+    @JsonProperty("jackpotCreatedPlayer")
+    private String jackpotCreatedPlayer;
+
     @JsonProperty("playersList")
     private List<String> playersList;
 

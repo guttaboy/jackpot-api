@@ -27,11 +27,13 @@ public class JackpotController {
 
     @PostMapping(value = "/createJackpot", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public JackpotCreateResponseModel updateJackpotActivationDetails(
-            String playerName,
+            String organizerName,
             @RequestBody JackpotActivationModel jackpotActivationModel) throws Exception {
         validatorUtil.validateJackpotActivationModel(jackpotActivationModel);
+        //validate if jackpot organizer is available in the players list
+        validatorUtil.validateJackpotOrganizerIsAvailableInPlayersList(organizerName, jackpotActivationModel.getPlayersList());
         // service call here
-        var jackpotCreateResponseModel = jackpotActivationService.createJackpot(playerName, jackpotActivationModel);
+        var jackpotCreateResponseModel = jackpotActivationService.createJackpot(organizerName, jackpotActivationModel);
         return jackpotCreateResponseModel;
     }
 

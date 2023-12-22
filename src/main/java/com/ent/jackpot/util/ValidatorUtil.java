@@ -17,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -77,6 +75,7 @@ public class ValidatorUtil {
         validateIObjectNull(matchCreateModel.getMatchNumber(), "Match Number is Missing");
         validateIObjectNull(matchCreateModel.getTeam1(), "Team 1 is Missing");
         validateIObjectNull(matchCreateModel.getTeam2(), "Team 2 is Missing");
+        validateIObjectNull(matchCreateModel.getMaxPoints(), "Match Max Points Are Missing");
     }
 
     public void validatePredictionModel(PredictionModel predictionModel){
@@ -105,6 +104,12 @@ public class ValidatorUtil {
 
     public void validateMatchNumber(Integer jackpotId, String matchNumber, String playerName){
         //Implement validate match number
+    }
+
+    public void validateJackpotOrganizerIsAvailableInPlayersList(String organizerName, List<String> playersList ){
+        if(!playersList.contains(organizerName)){
+            throw new JackpotApiException(HttpStatus.BAD_REQUEST, "Invalid Input Error", "Jackpot Organizer Must Be Available In The Players List");
+        }
     }
 
 }

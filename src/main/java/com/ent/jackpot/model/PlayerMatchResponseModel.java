@@ -30,6 +30,9 @@ public class PlayerMatchResponseModel {
     @JsonProperty("prediction")
     private String prediction;
 
+    @JsonProperty("winner")
+    private String winner;
+
     @JsonProperty("result")
     private String result;
 
