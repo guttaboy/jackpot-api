@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.Predicate;
 
 @Component
 @Slf4j
@@ -19,6 +20,15 @@ public class PointsSpecs {
     public Specification<Points> getPointsByMatchId(Integer matchId){
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("matchId"), matchId);
+    }
+
+    public Specification<Points> getPointsByPlayerIdAndMatchId(Integer playerId, Integer matchId){
+        return (root, query, criteriaBuilder) -> {
+            Predicate predicatePlayerId = criteriaBuilder.equal(root.get("playerActivationId"), playerId);
+            Predicate predicateMatchId = criteriaBuilder.equal(root.get("matchId"), matchId);
+
+            return criteriaBuilder.and(predicatePlayerId, predicateMatchId);
+        };
     }
 
 }

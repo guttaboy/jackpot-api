@@ -57,9 +57,9 @@ public class JackpotService {
     @Autowired
     CommonService commonService;
 
-    public JackpotCreateResponseModel createJackpot(String playerName, JackpotActivationModel jackpotActivationModel){
+    public JackpotCreateResponseModel createJackpot(String organizerName, JackpotActivationModel jackpotActivationModel){
         //get player id by player name
-        var jackpotCreatedPlayerId = commonService.getPlayerIdByPlayerName(playerName);
+        var jackpotCreatedPlayerId = commonService.getPlayerIdByPlayerName(organizerName);
         //create Jackpot entity and save it
         var jackpot = Jackpot.builder()
                 .jackpotMoney(jackpotActivationModel.getJackpotAmount())

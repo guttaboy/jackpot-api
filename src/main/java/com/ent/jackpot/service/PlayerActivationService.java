@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @NoArgsConstructor
@@ -85,7 +86,7 @@ public class PlayerActivationService {
         retrievePlayersList(jackpotIds, playerJackpotResponseModelList);
 
         //retrieve Match Details associated to the jackpot
-        retrievePlayerMatchDetails(jackpotIds, playerJackpotResponseModelList);
+        retrievePlayerMatchDetails(jackpotIds, playerJackpotResponseModelList, playerId);
         responseBody.setJackpotsList(playerJackpotResponseModelList);
 
         return responseBody;
@@ -105,7 +106,7 @@ public class PlayerActivationService {
         });
     }
 
-    private void retrievePlayerMatchDetails(List<Integer> jackpotIds, List<PlayerJackpotResponseModel> playerJackpotResponseModelList){
+    private void retrievePlayerMatchDetails(List<Integer> jackpotIds, List<PlayerJackpotResponseModel> playerJackpotResponseModelList, Integer playerId){
         //retrieve Match Details associated to the jackpot
         jackpotIds.forEach(jackpot -> {
             List<Match> matchEntityList = matchRepository.findAll(matchSpecs.getMatchDetailsByJackpotId(jackpot));
@@ -118,8 +119,24 @@ public class PlayerActivationService {
                     match.setTeam1(matchEntity.getTeam1());
                     match.setTeam2(matchEntity.getTeam2());
                     //retrieve Prediction Details
-                    var predictedTeam = commonService.getPredictionDetails(matchEntity);
+//                    var predictedTeam = commonService.getPredictionDetails(matchEntity.getMatchId());
+                    var predictedTeam = commonService.getPredictionDetailsByMatchIdAndPlayerId(matchEntity.getMatchId(), playerId);
                     match.setPrediction(predictedTeam);
+                    //retrieve match points that player gained
+                    var pointsEntity = commonService.getMatchPointsByPlayerIdAndMatchId(playerId, matchEntity.getMatchId());
+                    if(Objects.nonNull(pointsEntity)){
+                        if(pointsEntity.get().getPoints() != null){
+                            match.setMatchPoints(pointsEntity.get().getPoints());
+                            if(pointsEntity.get().getPoints().equals("1")){
+                                match.setResult("Congrats you won the prediction");
+                            }else{
+                                match.setResult("You lost the prediction");
+                            }
+                        }else{
+                            match.setMatchPoints("N.A");
+                            match.setResult("No result yet");
+                        }
+                    }
                     playerMatchResponseBodyList.add(match);
                 }
                 // Filter jackpotResponseList based on jackpotID

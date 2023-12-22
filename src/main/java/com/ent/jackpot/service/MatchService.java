@@ -3,7 +3,7 @@ package com.ent.jackpot.service;
 import com.ent.jackpot.entity.Match;
 import com.ent.jackpot.entity.Points;
 import com.ent.jackpot.exception.JackpotApiException;
-import com.ent.jackpot.model.CreateMatchResponseModel;
+import com.ent.jackpot.model.CreateResponseModel;
 import com.ent.jackpot.model.MatchCreateModel;
 import com.ent.jackpot.model.MatchesResponseModel;
 import com.ent.jackpot.repository.MatchRepository;
@@ -35,18 +35,30 @@ public class MatchService {
     @Autowired
     PointsRepository pointsRepository;
 
-    public CreateMatchResponseModel createMatchesList(List<MatchCreateModel> matchCreateModelList, Integer jackpotId){
+    public CreateResponseModel createMatchesList(List<MatchCreateModel> matchCreateModelList, Integer jackpotId, List<String> requestPayloadMatchNumbersList){
+        //fetch existing matches assigned to the given jackpotId
+        var matchNumbers = new ArrayList<String>();
+        commonService.getMatchNumbersByJackpotId(jackpotId, matchNumbers);
+        //validate if request payload matchNumbers exist in DB, if yes throw an exception
+        for(String payloadMatchNumber: requestPayloadMatchNumbersList){
+            if(matchNumbers.contains(payloadMatchNumber)){
+                throw new JackpotApiException(HttpStatus.BAD_REQUEST, "Invalid Input Error", "Provided Match Number: " + payloadMatchNumber + " Already Exists In The DB");
+            }
+        }
         matchCreateModelList.forEach(matchCreateModel -> {
             createMatch(matchCreateModel, jackpotId);
         });
-        var createMatchResponseModel = new CreateMatchResponseModel();
-        createMatchResponseModel.setMessage("Matches created successfully");
+        var createMatchResponseModel = new CreateResponseModel();
+        createMatchResponseModel.setResponseMessage("Matches created successfully");
         createMatchResponseModel.setStatusCode(HttpStatus.CREATED);
 
         return createMatchResponseModel;
     }
 
     public void createMatch(MatchCreateModel matchCreateModel, Integer jackpotId){
+        //get player Ids associated the jackpot
+        var playerIds = new ArrayList<Integer>();
+        commonService.getPlayerIdsFromPlrAscnByJkptId(jackpotId, playerIds);
 
         var match = Match.builder()
                 .matchNumber(matchCreateModel.getMatchNumber())
@@ -58,19 +70,21 @@ public class MatchService {
 
         var createdMatch = matchRepository.save(match);
         if(createdMatch == null) {
-            throw new JackpotApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data Base Issue", "Unexpected exception occured while creating the records");
+            throw new JackpotApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data Base Issue", "Unexpected Exception Occurred While Creating The Records");
         }
 
-        //set Maximum points to the match while creating
-        var points = Points.builder()
-                .matchId(createdMatch.getMatchId())
-                .maximumPoints(matchCreateModel.getMaxPoints())
-                .build();
-        var createdPoints = pointsRepository.save(points);
-        if(createdPoints == null) {
-            throw new JackpotApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data Base Issue", "Unexpected exception occured while creating the records");
-        }
-
+        //set Maximum points to the match for all players in the jackpot while creating
+        playerIds.forEach(playerId -> {
+            var points = Points.builder()
+                    .matchId(createdMatch.getMatchId())
+                    .maximumPoints(matchCreateModel.getMaxPoints())
+                    .playerActivationId(playerId)
+                    .build();
+            var createdPoints = pointsRepository.save(points);
+            if(createdPoints == null) {
+                throw new JackpotApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Data Base Issue", "Unexpected Exception Occurred While Creating The Records");
+            }
+        });
     }
 
     public List<MatchesResponseModel> getMatchesFromJackpot(Integer jackpotId){

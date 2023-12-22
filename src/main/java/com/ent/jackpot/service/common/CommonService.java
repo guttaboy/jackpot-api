@@ -171,21 +171,56 @@ public class CommonService {
         }
     }
 
-    public String getPredictionDetails(Match match){
-        Optional<Prediction> predictionEntity = predictionRepository.findOne(predictionSpecs.getPredictionDetailsByMatchId(match.getMatchId()));
+    public String getPredictionDetails(Integer matchId){
+        Optional<Prediction> predictionEntity = predictionRepository.findOne(predictionSpecs.getPredictionDetailsByMatchId(matchId));
         if(predictionEntity.isPresent()) {
             return predictionEntity.get().getPredictedTeam();
         }else{
-            return "TBD";
+            return "Not Predicted";
+        }
+    }
+
+    public String getPredictionDetailsByMatchIdAndPlayerId(Integer matchId, Integer playerId){
+        Optional<Prediction> predictionEntity = predictionRepository.findOne(predictionSpecs.getPredictionDetailsByMatchIdAndPlayerId(matchId, playerId));
+        if(predictionEntity.isPresent()) {
+            return predictionEntity.get().getPredictedTeam();
+        }else{
+            return "Not Predicted";
         }
     }
 
     private Integer getMaxPointsByMatchId(Integer matchId){
-        Optional<Points> pointsEntity = pointsRepository.findOne(pointsSpecs.getPointsByMatchId(matchId));
-        if(pointsEntity.isPresent()) {
-            return pointsEntity.get().getMaximumPoints();
+        List<Points> pointsEntityList = pointsRepository.findAll(pointsSpecs.getPointsByMatchId(matchId));
+        if(!CollectionUtils.isEmpty(pointsEntityList)) {
+            var maxPointsSet = new HashSet<Integer>();
+            for(Points pointsEntity: pointsEntityList){
+                maxPointsSet.add(pointsEntity.getMaximumPoints());
+            }
+            if(maxPointsSet.size() == 1){
+                return 1;
+            }else{
+                return null;
+            }
         }else{
-            return 0;
+            return null;
+        }
+    }
+
+    public void getMatchNumbersByJackpotId(Integer jackpotId, List<String> matchNumbers){
+        List<Match> matchEntityList = matchRepository.findAll(matchSpecs.getMatchDetailsByJackpotId(jackpotId));
+        if(!CollectionUtils.isEmpty(matchEntityList)){
+            for(Match matchEntity: matchEntityList){
+                matchNumbers.add(matchEntity.getMatchNumber());
+            }
+        }
+    }
+
+    public Optional<Points> getMatchPointsByPlayerIdAndMatchId(Integer playerId, Integer matchId){
+        Optional<Points> pointsEntity = pointsRepository.findOne(pointsSpecs.getPointsByPlayerIdAndMatchId(playerId, matchId));
+        if(pointsEntity.isPresent()) {
+            return pointsEntity;
+        }else{
+            return null;
         }
     }
 

@@ -21,6 +21,9 @@ public class Points {
     @Column(name="MTCH_ID", nullable = false)
     private Integer matchId;
 
+    @Column(name = "PLR_ACT_ID", nullable = false)
+    private Integer playerActivationId;
+
     @Column(name="PTS")
     private String points;
 
