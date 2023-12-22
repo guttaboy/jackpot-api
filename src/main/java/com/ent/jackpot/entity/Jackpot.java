@@ -24,4 +24,7 @@ public class Jackpot {
     @Column(name="JKPT_MNY", nullable = false)
     private String jackpotMoney;
 
+    @Column(name="JKPT_CRTD_PLR_ID", nullable = false)
+    private Integer jackpotCreatedPlayerId;
+
 }

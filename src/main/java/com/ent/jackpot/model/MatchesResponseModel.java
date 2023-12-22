@@ -30,8 +30,8 @@ public class MatchesResponseModel {
 //    @JsonProperty("prediction")
 //    private String prediction;
 
-    @JsonProperty("won")
-    private String won;
+    @JsonProperty("winner")
+    private String winner;
 
     @JsonProperty("maximumPoints")
     private Integer maximumPoints;

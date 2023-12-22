@@ -25,6 +25,7 @@ public class MatchController {
     @Autowired
     MatchService matchService;
 
+    /*
     @Transactional
     @PostMapping(value = "/createMatch", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CreateMatchResponseModel createMatchInJackpot(
@@ -34,10 +35,11 @@ public class MatchController {
         // service call here
         return matchService.createMatch(matchCreateModel, jackpotId);
     }
+     */
 
     @Transactional
     @PostMapping(value = "/createMatches", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String createMatchesInJackpot(
+    public CreateMatchResponseModel createMatchesInJackpot(
             @RequestBody List<MatchCreateModel> matchCreateModelList, Integer jackpotId) {
         validatorUtil.validateJackpot(jackpotId);
         matchCreateModelList.forEach(matchCreateModel -> {
