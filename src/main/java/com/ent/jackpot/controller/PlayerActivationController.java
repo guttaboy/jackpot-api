@@ -1,6 +1,5 @@
 package com.ent.jackpot.controller;
 
-import com.ent.jackpot.model.JackpotResponseModel;
 import com.ent.jackpot.model.PlayerActivationModel;
 import com.ent.jackpot.model.PlayerDetailsResponseModel;
 import com.ent.jackpot.service.PlayerActivationService;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-@RequestMapping("/api/profile/v1")
+@RequestMapping("/api/jackpot/v1")
 @Slf4j
 public class PlayerActivationController {
 

@@ -6,8 +6,9 @@ import com.ent.jackpot.exception.JackpotApiException;
 import com.ent.jackpot.jpaspecs.JackpotSpecs;
 import com.ent.jackpot.jpaspecs.PlayerSpecs;
 import com.ent.jackpot.model.JackpotActivationModel;
-import com.ent.jackpot.model.MatchRequestModel;
+import com.ent.jackpot.model.MatchCreateModel;
 import com.ent.jackpot.model.PlayerActivationModel;
+import com.ent.jackpot.model.PredictionModel;
 import com.ent.jackpot.repository.JackpotRepository;
 import com.ent.jackpot.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
@@ -71,11 +72,16 @@ public class ValidatorUtil {
         }
     }
 
-    public void validateMatchRequestModel(MatchRequestModel matchRequestModel){
-        validateIObjectNull(matchRequestModel.getMatchName(), "Match Name is Missing");
-        validateIObjectNull(matchRequestModel.getMatchNumber(), "Match Number is Missing");
-        validateIObjectNull(matchRequestModel.getTeam1(), "Team 1 is Missing");
-        validateIObjectNull(matchRequestModel.getTeam2(), "Team 2 is Missing");
+    public void validateMatchRequestModel(MatchCreateModel matchCreateModel){
+        validateIObjectNull(matchCreateModel.getMatchName(), "Match Name is Missing");
+        validateIObjectNull(matchCreateModel.getMatchNumber(), "Match Number is Missing");
+        validateIObjectNull(matchCreateModel.getTeam1(), "Team 1 is Missing");
+        validateIObjectNull(matchCreateModel.getTeam2(), "Team 2 is Missing");
+    }
+
+    public void validatePredictionModel(PredictionModel predictionModel){
+        validateIObjectNull(predictionModel.getPredictedTeam(), "Team Name must be provided for prediction");
+        validateIObjectNull(predictionModel.getMatchNumber(), "Match Number must be provided for prediction");
     }
 
     private void validateIObjectNull(Object object, String errorMessage){
@@ -95,6 +101,10 @@ public class ValidatorUtil {
         if(playerEntity.isPresent()){
             throw new JackpotApiException(HttpStatus.BAD_REQUEST, "Invalid Input Error", "username already exists, try another username");
         }
+    }
+
+    public void validateMatchNumber(Integer jackpotId, String matchNumber, String playerName){
+        //Implement validate match number
     }
 
 }

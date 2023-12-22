@@ -5,7 +5,6 @@ import com.ent.jackpot.entity.Player;
 import com.ent.jackpot.entity.PlayerAssociation;
 import com.ent.jackpot.jpaspecs.MatchSpecs;
 import com.ent.jackpot.jpaspecs.PlayerAssociationSpecs;
-import com.ent.jackpot.jpaspecs.PlayerSpecs;
 import com.ent.jackpot.model.*;
 import com.ent.jackpot.repository.MatchRepository;
 import com.ent.jackpot.repository.PlayerAssociationRepository;
@@ -21,9 +20,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import static jdk.nashorn.internal.objects.NativeArray.forEach;
 
 @Service
 @NoArgsConstructor
@@ -36,9 +32,6 @@ public class PlayerActivationService {
 
     @Autowired
     PlayerAssociationRepository playerAssociationRepository;
-
-    @Autowired
-    PlayerSpecs playerSpecs;
 
     @Autowired
     PlayerAssociationSpecs playerAssociationSpecs;
@@ -72,17 +65,15 @@ public class PlayerActivationService {
 
         //once the validation is done get details
         //get PlayerId by using userName
-        Optional<Player> playerEntity = playerRepository.findOne(playerSpecs.getPlayerDetailsByUserName(userName));
-        var jackpotIds = new ArrayList<Integer>();
-        if(playerEntity.isPresent()){
-            var playerId = playerEntity.get().getPlayerActivationId();
-            //fetch jackpot details the player is associated to
-            List<PlayerAssociation> playerAssoociationEntityList = playerAssociationRepository.findAll(playerAssociationSpecs.getPlayerAssociationByPlayerId(playerId));
 
-            if(!CollectionUtils.isEmpty(playerAssoociationEntityList)){
-                for(PlayerAssociation playerAscnEntity: playerAssoociationEntityList){
+        var playerId = commonService.getPlayerIdByPlayerName(userName);
+        var jackpotIds = new ArrayList<Integer>();
+        //fetch jackpot details the player is associated to
+        List<PlayerAssociation> playerAssoociationEntityList = playerAssociationRepository.findAll(playerAssociationSpecs.getPlayerAssociationByPlayerId(playerId));
+
+        if(!CollectionUtils.isEmpty(playerAssoociationEntityList)){
+            for(PlayerAssociation playerAscnEntity: playerAssoociationEntityList){
                     jackpotIds.add(playerAscnEntity.getJackpotId());
-                }
             }
         }
 
@@ -121,19 +112,21 @@ public class PlayerActivationService {
             if(!CollectionUtils.isEmpty(matchEntityList)) {
                 var playerMatchResponseBodyList = new ArrayList<PlayerMatchResponseModel>();
                 for (Match matchEntity : matchEntityList) {
-
                     var match = new PlayerMatchResponseModel();
                     match.setMatchName(matchEntity.getMatchName());
                     match.setMatchNumber(matchEntity.getMatchNumber());
                     match.setTeam1(matchEntity.getTeam1());
                     match.setTeam2(matchEntity.getTeam2());
+                    //retrieve Prediction Details
+                    var predictedTeam = commonService.getPredictionDetails(matchEntity);
+                    match.setPrediction(predictedTeam);
                     playerMatchResponseBodyList.add(match);
                 }
                 // Filter jackpotResponseList based on jackpotID
                 playerJackpotResponseModelList.stream()
-                        .filter(jackpotResponse -> jackpotResponse.getJackpotId().equals(String.valueOf(jackpot)))
-                        // Assign playerMatchResponseBodyList to the filtered list
-                        .forEach(jackpotResponse -> jackpotResponse.setMatchesList(playerMatchResponseBodyList));
+                    .filter(jackpotResponse -> jackpotResponse.getJackpotId().equals(String.valueOf(jackpot)))
+                    // Assign playerMatchResponseBodyList to the filtered list
+                    .forEach(jackpotResponse -> jackpotResponse.setMatchesList(playerMatchResponseBodyList));
             }
         });
     }

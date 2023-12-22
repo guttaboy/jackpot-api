@@ -1,25 +1,18 @@
 package com.ent.jackpot.service.common;
 
-import com.ent.jackpot.entity.Jackpot;
-import com.ent.jackpot.entity.Match;
-import com.ent.jackpot.entity.Player;
-import com.ent.jackpot.entity.PlayerAssociation;
-import com.ent.jackpot.jpaspecs.JackpotSpecs;
-import com.ent.jackpot.jpaspecs.MatchSpecs;
-import com.ent.jackpot.jpaspecs.PlayerAssociationSpecs;
-import com.ent.jackpot.jpaspecs.PlayerSpecs;
+import com.ent.jackpot.entity.*;
+import com.ent.jackpot.exception.JackpotApiException;
+import com.ent.jackpot.jpaspecs.*;
 import com.ent.jackpot.model.JackpotResponseModel;
 import com.ent.jackpot.model.MatchesResponseModel;
 import com.ent.jackpot.model.PlayerJackpotResponseModel;
-import com.ent.jackpot.repository.JackpotRepository;
-import com.ent.jackpot.repository.MatchRepository;
-import com.ent.jackpot.repository.PlayerAssociationRepository;
-import com.ent.jackpot.repository.PlayerRepository;
+import com.ent.jackpot.repository.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -56,6 +49,18 @@ public class CommonService {
 
     @Autowired
     MatchSpecs matchSpecs;
+
+    @Autowired
+    PredictionRepository predictionRepository;
+
+    @Autowired
+    PredictionSpecs predictionSpecs;
+
+    @Autowired
+    PointsRepository pointsRepository;
+
+    @Autowired
+    PointsSpecs pointsSpecs;
 
     public JackpotResponseModel getJackpotDetails(Integer jackpotId){
         //retrieve jackpot details using jackpotId
@@ -128,8 +133,47 @@ public class CommonService {
                 match.setMatchNumber(matchEntity.getMatchNumber());
                 match.setTeam1(matchEntity.getTeam1());
                 match.setTeam2(matchEntity.getTeam2());
+                match.setMaximumPoints(getMaxPointsByMatchId(matchEntity.getMatchId()));
                 matchResponseBodyList.add(match);
             }
+        }
+    }
+
+    public Integer getPlayerIdByPlayerName(String playerName){
+        //get PlayerId by using userName
+        Optional<Player> playerEntity = playerRepository.findOne(playerSpecs.getPlayerDetailsByUserName(playerName));
+        if(playerEntity.isPresent()) {
+            return playerEntity.get().getPlayerActivationId();
+        }else{
+            throw  new JackpotApiException(HttpStatus.NOT_FOUND, "No Data Found", "Player doesn't exist");
+        }
+    }
+
+    public Integer getMatchIdByMatchNumber(String matchNumber, Integer jackpotId){
+        //get Match Id by using match Number & Jactkpot Id
+        Optional<Match> matchEntity = matchRepository.findOne(matchSpecs.getMatchDetailsByJackpotIdAndMatchNumber(matchNumber, jackpotId));
+        if(matchEntity.isPresent()) {
+            return matchEntity.get().getMatchId();
+        }else{
+            throw  new JackpotApiException(HttpStatus.NOT_FOUND, "No Data Found", "Match doesn't exist");
+        }
+    }
+
+    public String getPredictionDetails(Match match){
+        Optional<Prediction> predictionEntity = predictionRepository.findOne(predictionSpecs.getPredictionDetailsByMatchId(match.getMatchId()));
+        if(predictionEntity.isPresent()) {
+            return predictionEntity.get().getPredictedTeam();
+        }else{
+            return "TBD";
+        }
+    }
+
+    private Integer getMaxPointsByMatchId(Integer matchId){
+        Optional<Points> pointsEntity = pointsRepository.findOne(pointsSpecs.getPointsByMatchId(matchId));
+        if(pointsEntity.isPresent()) {
+            return pointsEntity.get().getMaximumPoints();
+        }else{
+            return 0;
         }
     }
 
